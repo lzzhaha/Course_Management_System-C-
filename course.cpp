@@ -8,9 +8,13 @@
  * Constructor: The STL vector, pre_requisites, is initialized from an int array
  *   prerequisites of size pre_num
  */
-Course::Course(int code, weekday day1, weekday day2, int stime, int etime,
-               int* prerequisites, int pre_num)
-{ }
+Course::Course(int code, weekday day1, weekday day2, int stime, int etime, int* prerequisites, int pre_num):
+course_code(code), lecture_time(day1,day2,stime,etime)
+{
+	for(int i=0;i<pre_num;i++){
+		pre_requisites.push_back(prerequisites[i]);
+	}
+}
 
 // Accessors
 int Course::get_code() const
@@ -28,7 +32,7 @@ const Timeslot& Course::get_time() const
  */
 int Course::get_num_prerequisites() const
 {
-
+	return pre_requisites.size();
 }
 
 /* TODO
@@ -36,7 +40,7 @@ int Course::get_num_prerequisites() const
  */
 int Course::get_prerequisites(int index) const
 {
-    
+    return pre_requisites[index-1];
 }
 
 /* Print out courses using an overloaded operator<< 

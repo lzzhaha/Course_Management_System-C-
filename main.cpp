@@ -14,7 +14,8 @@ using namespace std;
 
 int main()
 {
-    // Create some courses, possibly with pre-requisites
+    /*
+	// Create some courses, possibly with pre-requisites
     int pre1[] = { };
     Course c1(1001, Wed, Thu, 9, 10, pre1, 0);
     int pre2[] = { };
@@ -184,6 +185,7 @@ int main()
 
     s1.print_course_plan_tree(); cout << endl;
     s2.print_course_plan_tree(); cout << endl;
+    */
     return 0;
 }
 
