@@ -37,7 +37,7 @@ void Student::update_course_history(const map<int, Course>& course_db, int code)
     //If it is valid, add it to course_history.
 
     //Otherwise print an appropriate message, please refer to the sample output.
-	map<int, Course>::iterator citerator;
+	map<int, Course>::const_iterator citerator;
 	citerator = course_db.find(code);
 
 	if(citerator == course_db.end()){
@@ -83,7 +83,7 @@ void Student::enroll(const map<int, Course>& course_db, int code)
 
     //Please refer to the sample output for all messages.
 
-	map<int,Course>::iterator citerator = course_db.find(code);
+	map<int,Course>::const_iterator citerator = course_db.find(code);
 
 	if(citerator == course_db.end()){
 		cout << id << ": ";
@@ -93,10 +93,9 @@ void Student::enroll(const map<int, Course>& course_db, int code)
 
 	bool isSatis = true;
 
-	vector<int>::iterator pre_it;
-
-	for(pre_it = citerator->second.pre_requisites.begin(); pre_it != citerator->second.pre_requisites.end();pre_it++){
-		if(course_history.find(*pre_it)==course_history.end()){
+	for(int i = 0; i < citerator->second.get_num_prerequisites();i++){
+		int pre = citerator->second.get_prerequisites(i+1);
+		if(course_history.find(pre) == course_history.end()){
 			isSatis = false;
 			break;
 		}

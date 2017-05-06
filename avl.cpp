@@ -18,9 +18,9 @@ member	functions*/
 template <typename T, typename K>
 int AVL<T,K>::bfactor() const
 {
-   AVL<T,K>* right_sub = dynamic_cast<AVL<T,K>*>(this->right_subtree());
+   const AVL<T,K>* right_sub = dynamic_cast<const AVL<T,K>*>(this->right_subtree());
    int rheight = right_sub->height();
-   AVL<T,K>* left_sub = dynamic_cast<AVL<T,K>*>(left_subtree());
+   const AVL<T,K>* left_sub = dynamic_cast<const AVL<T,K>*>(this->left_subtree());
    int lheight = left_sub->height();
 
    return rheight-lheight;
@@ -37,8 +37,7 @@ void AVL<T,K>::fix_height() const
 	int lheight = 0;
 
 	//Find the height of right subtree
-
-	AVL<T,K>* right_sub = dynamic_cast<AVL<T,K>>(this->right_subtree());
+	const AVL<T,K>* right_sub = dynamic_cast<const AVL<T,K>*>(this->right_subtree());
 
 	if(right_sub == NULL){
 		rheight = 0;
@@ -75,7 +74,7 @@ void AVL<T,K>::rotate_left()
 
     AVL<T,K>* left_sub = dynamic_cast<AVL<T,K>*>(this->left_subtree());
 
-    origin->right->root = left_sub->root;
+    dynamic_cast<AVL<T,K>*>(origin->right)->root = left_sub->root;
 
     left_sub->root = origin;
 }
@@ -95,7 +94,7 @@ void AVL<T,K>::rotate_right()
 
      AVL<T,K>* right_sub = dynamic_cast<AVL<T,K>*>(this->right_subtree());
 
-     origin->left->root = right_sub->root;
+     dynamic_cast<AVL<T,K>*>(origin->left)->root = right_sub->root;
 
      right_sub->root = origin;
 }
@@ -159,7 +158,7 @@ void AVL<T,K>::insert(const T& x, const K& k)
 template <typename T, typename K>
 void AVL<T,K>::remove(const K& k)
 {
-    BST<T,K>::remove(x,k);
+    BST<T,K>::remove(k);
     balance();
 }
 
