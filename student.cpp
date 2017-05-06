@@ -10,9 +10,19 @@
  * - num is the length of this array
  * When cp_type = AVL_CP, store course_plan as an AVL tree; otherwise store course_plan as a BST
  */
-Student::Student(const string& id, const int* history, int num, CP_TYPE cp_type)
+Student::Student(const string& id, const int* history, int num, CP_TYPE cp_type):
+id(id)
 {
-
+	for(int i=0; i< num;i++){
+		course_history.insert(history[i]);
+	}
+	switch(cp_type){
+		case BST_CP:
+			course_plan = new BST<Course,int>;
+			break;
+		case AVL_CP:
+			course_plan = new AVL<Course,int>;
+	}
 }
 
 
@@ -22,14 +32,21 @@ Student::Student(const string& id, const int* history, int num, CP_TYPE cp_type)
  */
 void Student::update_course_history(const map<int, Course>& course_db, int code)
 {
-    //Write your codes here.
-
     //Check whether the course code is valid, i.e., it exists in the course_db.
 
     //If it is valid, add it to course_history.
 
     //Otherwise print an appropriate message, please refer to the sample output.
+	map<int, Course>::iterator citerator;
+	citerator = course_db.find(code);
 
+	if(citerator == course_db.end()){
+		cout<<id<<": ";
+		cout<<"Fail to update history with an invalid course COMP"<<code<<endl;
+		return;
+	}
+
+	course_history.insert(code);
 }
 
 
@@ -41,8 +58,11 @@ void Student::update_course_history(const map<int, Course>& course_db, int code)
 void Student::print_course_history() const
 {
     cout << id << ": Course history: ";
-
-    //Write your codes here
+    set<int>::iterator citerator;
+    for(citerator = course_history.begin();citerator != course_history.end(); citerator++){
+    	cout<<*citerator<<" ";
+    }
+    cout<<endl;
 
 }
 
@@ -63,6 +83,31 @@ void Student::enroll(const map<int, Course>& course_db, int code)
 
     //Please refer to the sample output for all messages.
 
+	map<int,Course>::iterator citerator = course_db.find(code);
+
+	if(citerator == course_db.end()){
+		cout << id << ": ";
+		cout<<"Fail to enroll an invalid course COMP"<<code<<endl;
+		return;
+	}
+
+	bool isSatis = true;
+
+	vector<int>::iterator pre_it;
+
+	for(pre_it = citerator->second.pre_requisites.begin(); pre_it != citerator->second.pre_requisites.end();pre_it++){
+		if(course_history.find(*pre_it)==course_history.end()){
+			isSatis = false;
+			break;
+		}
+	}
+
+	if(isSatis){
+		course_plan->insert(citerator->second,code);
+	}else{
+		cout<<id << ": ";
+		cout<<"Can't enroll COMP"<<code<<". Not all pre-requisites are satisfied yet."<<endl;
+	}
 }
 
 /* TODO:
@@ -70,7 +115,7 @@ void Student::enroll(const map<int, Course>& course_db, int code)
  */
 void Student::drop(const int code)
 {
-    //Write your codes here
+    course_plan->remove(code);
 }
 
 
@@ -81,7 +126,14 @@ void Student::select_by_code(int base)
 {
     cout << "Student ID: " << id << endl;
 
-    //Write your codes here
+    course_plan->iterator_init();
+
+    while(!course_plan->iterator_end()){
+    	Course cr = course_plan->iterator_next();
+    	if(cr.get_code() > base){
+    		cout<<cr<<endl;
+    	}
+    }
 
 }
 
@@ -92,8 +144,14 @@ void Student::select_by_day(weekday day)
 {
     cout << "Student ID: " << id << endl;
 
-    //Write your codes here
+    course_plan->iterator_init();
 
+    while(!course_plan->iterator_end()){
+    	Course cr = course_plan->iterator_next();
+    	if(cr.get_time().match(day)){
+    		cout<<cr<<endl;
+    	}
+    }
 }
 
 /* TODO: Check the details of an enrolled course
@@ -104,6 +162,12 @@ void Student::check_course(int code) const
     //Write your codes here
 
     //Please refer to the sample output for the output message.
+	BT<Course,int>* result = course_plan->search(code);
+	if(result->is_empty()){
+		cout<<"No"<<endl;
+	}else{
+		result->print_value();
+	}
 
 }
     
@@ -117,6 +181,7 @@ void Student::list_course_plan() const
     cout << "Student ID: " << id << endl;
     
     //Write your codes here
+    course_plan->preorder_traversal();
 
 }
 

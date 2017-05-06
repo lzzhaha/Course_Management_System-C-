@@ -17,13 +17,14 @@ BT<T,K>* BST<T,K>::search(const K& k)
 {
     //write your codes here
 	//Use dynamic cast to convert the abstract base class pointer to BST pointer
-	if(this->root->key == k||root==NULL){
+	if(this->root->key == k||this->root==NULL){
 		return this;
 	}else if(this->root->key < k){
 
 		BST<T,K> *right_sub = dynamic_cast<BST<T,K>*>(this->root->right);
 		return right_sub->search(k);
 	}else{
+
 		BST<T,K> *left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
 		return left_sub->search(k);
 	}
@@ -55,15 +56,28 @@ void BST<T,K>::insert(const T& x, const K& k)
 {
     //write your codes here
 	if(this->root->key == k){
+
 		return;
+
 	}else if(this->root == NULL){
-		this->root = new node(x,k);
+
+		this->root = new bt_node(x,k);
+
 	}else if(this->root->key < k){
+
 		this->root->bt_height++;
-		this->root->right->insert(k);
+
+		BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(this->root->right);
+
+		right_sub->insert(x,k);
+
 	}else{
+
 		this->root->bt_height++;
-		this->root->left->insert(k);
+
+		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
+
+		left_sub->insert(x,k);
 	}
 }
 
@@ -83,7 +97,7 @@ void BST<T,K>::remove(const K& k)
 	if(this->root->key > k){
 		this->root->bt_height--;
 		this->root->left->remove(k);
-	}else if(root->key <k){
+	}else if(this->root->key <k){
 		this->root->bt_height--;
 		this->root->right->remove(k);
 	}
@@ -91,12 +105,14 @@ void BST<T,K>::remove(const K& k)
 	//the target node is found, there are three cases
 
 	//Two children: move root to point to the node with minimum node of right sub tree and adjust the relationship
-	if(this->root->left && root->right){
+	if(this->root->left && this->root->right){
 		bt_node* del_node = this->root;
-		BT<T,K>* newRoot = this->root->right->fing_min();
+		BST<T,K>* newRoot = dynamic_cast<BST<T,K>*>(this->root->right->find_min());
 		this->root = newRoot->root;
 
-		newRoot->root = newRoot->root->right;
+		BST<T,K>* new_right_sub = dynamic_cast<BST<T,K>*>(newRoot->root->right);
+
+		newRoot->root = new_right_sub->root;
 		this->root->left = del_node->left;
 		this->root->right = del_node->right;
 
@@ -105,9 +121,13 @@ void BST<T,K>::remove(const K& k)
 	}else{
 		//One child or no child
 		//set the pointer points to its child (if any) then delete it directly
-		bt_node* del_node = root;
-		this->root = (node->left == NULL)? node->right:node->left;
-		del_node->left = del->right = NULL;
+		bt_node* del_node = this->root;
+
+		BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(del_node->right);
+		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(del_node->left);
+
+		this->root = (right_sub == NULL)? left_sub->root:right_sub->root;
+		del_node->left = del_node->right = NULL;
 		delete del_node;
 	}
 }
@@ -151,7 +171,7 @@ void BST<T,K>::iterator_init()
 template<typename T, typename K>
 bool BST<T,K>::iterator_end()
 {
-    return current!=NULL;
+    return this->current == NULL;
 }
 
 
