@@ -22,7 +22,7 @@ void BT<T,K>::preorder_traversal() const
 		root->left->preorder_traversal();
 	}
 	if(root->right != NULL){
-		root->right->pre_oreder_traversal();
+		root->right->preorder_traversal();
 	}
 
 }
