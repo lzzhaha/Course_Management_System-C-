@@ -45,7 +45,7 @@ void BST<T,K>::print(int depth) const
     for (int j = 0; j < depth; j++) // Print the node value
         cout << "\t\t";
     cout << this->root->key << endl;
-
+    cout<<"height: "<<this->root->bt_height<<endl;
     if (this->left_subtree())
         this->left_subtree()->print(depth+1); // Recursion: left subtree
 }

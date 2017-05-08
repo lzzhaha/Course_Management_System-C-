@@ -12,6 +12,7 @@
  * Return: A pointer to the subtree whose root node contains the item if found,
  *         otherwise a NULL pointer.
  */
+using namespace std;
 template <typename T, typename K>
 BT<T,K>* BST<T,K>::search(const K& k)
 {
@@ -54,29 +55,43 @@ BT<T,K>* BST<T,K>::find_min()
 template <typename T, typename K>
 void BST<T,K>::insert(const T& x, const K& k)
 {
-    //write your codes here
-	if(this->root->key == k){
 
-		return;
+	if(  this->root == NULL){
 
-	}else if(this->root == NULL){
+		cout<< "The inserted key : "<< k<<" is inserted"<<endl;
 
 		this->root = new bt_node(x,k);
 
+	}else if(this->root->key == k){
+		//cout<< "The inserted key : "<< k<<" exists and equals to"<<this->root->key<<endl;
+		return;
 	}else if(this->root->key < k){
+		//cout<< "The inserted key : "<< k<<" is bigger than "<<this->root->key<<endl;
 
-		this->root->bt_height++;
+
+		if(this->root->right== NULL){
+			//create a new subtree if the right subtree is empty
+			this->root->right = new BST<T,K>;
+		}
 
 		BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(this->root->right);
 
+		//cout<<"insert "<<k<<" to the right subtree"<<endl;
 		right_sub->insert(x,k);
 
 	}else{
 
-		this->root->bt_height++;
+
+		//cout<< "The inserted key : "<< k<<" is smaller than "<<this->root->key<<endl;
+
+		if(this->root->left == NULL){
+					//create a new subtree if the right subtree is empty
+					this->root->left = new BST<T,K>;
+		}
 
 		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
 
+		//cout<<"insert "<<k<<" into left subtree"<<endl;
 		left_sub->insert(x,k);
 	}
 }
@@ -139,29 +154,17 @@ void BST<T,K>::remove(const K& k)
 template<typename T, typename K>
 void BST<T,K>::iterator_init()
 {
-	this->current = this->root;
-	while(!istack.empty()){
-		istack.pop();
-	}
-	//Use reverse-in-order_traversal to push the nodes into the stack, which constitutes a recursive stack as a whole
-/*
+	//Do nothing if the root is NULL
 	if(this->root == NULL){
 		return;
 	}
 
-	if(this->root->right != NULL){
-		BST<T,K> * right_sub = dynamic_cast<BST<T,K>*>(this->root->right);
-		right_sub->iterator_init();
-		istack.push(right_sub->root);
+	this->current = this->root;
+
+	while(!this->istack.empty()){
+		this->istack.pop();
 	}
 
-	istack.push(this->root);
-	if(left_sub != NULL){
-		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
-		left_sub->iterator_init();
-		istack.push(left_sub->root);
-	}
-*/
 }
 
 
@@ -171,7 +174,7 @@ void BST<T,K>::iterator_init()
 template<typename T, typename K>
 bool BST<T,K>::iterator_end()
 {
-    return this->current == NULL;
+    return this->istack.empty();
 }
 
 
@@ -181,9 +184,57 @@ bool BST<T,K>::iterator_end()
 template<typename T, typename K>
 T& BST<T,K>::iterator_next()
 {
-	T* t = new T;
-	return *t;
+	bt_node*& cur = this->current;
+	//the first time that this function is called
 
+	if(this->istack.empty()){
+		do{
+			this->istack.push(cur);
+
+			BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(cur->left);
+
+			cur = dynamic_cast<BST<T,K>*>(left_sub->left_subtree())->root;
+
+		}while(cur != NULL );
+		cur = this->istack.top();
+	}
+
+	//store the return value
+	T& re_val = cur->value;
+
+	//pop the return value
+	this->istack.pop();
+
+	/*Find the second smallest element : which should be located at the left_most node of the cur node's right subtree,
+	 * given that the right sub_tree's node is not null; if null, then move to its parent node, which is the top of the stack
+	 * */
+
+	BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(cur->right);
+
+	if( (right_sub !=NULL) && (right_sub->root != NULL) ){
+		cur = right_sub->root;
+		this->istack.push(cur);
+
+		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(cur->left);
+
+		//store the left chain into the stack.
+		while( (left_sub != NULL) && (left_sub->root != NULL) ){
+
+			cur = left_sub->root;
+
+			this->istack.push(cur);
+		}
+
+		//Now the top of the stack should be the smallest node of the right subtree of the returned node
+	}
+
+	// if the stack is empty at this point, it means that all the node has been returned
+	if(!this->istack.empty()){
+		//if the returned node has an empty right_subtree, then cur node should move to its parent node.
+		cur = this->istack.top();
+	}
+
+	return re_val;
 }
 
 

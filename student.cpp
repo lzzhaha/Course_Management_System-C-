@@ -102,7 +102,9 @@ void Student::enroll(const map<int, Course>& course_db, int code)
 	}
 
 	if(isSatis){
+		//cout<<citerator->first<<" is going to be inserted"<<endl;
 		course_plan->insert(citerator->second,code);
+		//cout<<citerator->first<<" has been inserted"<<endl;
 	}else{
 		cout<<id << ": ";
 		cout<<"Can't enroll COMP"<<code<<". Not all pre-requisites are satisfied yet."<<endl;
