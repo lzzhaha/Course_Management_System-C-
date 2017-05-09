@@ -82,21 +82,21 @@ int main()
 
     // Add an invalid course that doesn't exist in the DB to the course history 
     s1.update_course_history(db, 1122);
-    s1.print_course_history();
+   // s1.print_course_history();
     cout << endl;
 
     // Add two valid completed courses to the course history 
     s1.update_course_history(db, 2011);
     s1.update_course_history(db, 2012);
-    s1.print_course_history();  
+   // s1.print_course_history();
 
     s2.update_course_history(db, 2011);
     s2.update_course_history(db, 2012);
-    s2.print_course_history();
+    //s2.print_course_history();
     cout << endl;
 
     // Examples of failed enrolments (of courses to the course plan) 
-    s1.enroll(db, 1122); // An invalid course
+   /* s1.enroll(db, 1122); // An invalid course
     s1.enroll(db, 3511); // A course whose pre-requisites not in course history
     cout << endl;
 
@@ -107,19 +107,20 @@ int main()
     
     // Examples of successful enrolments (of courses to the course plan) 
     cout << "After enrolling courses 2611, 1001, 1999, 2021:" << endl;
+
+*//*
     s1.enroll(db, 2611); // s1 enrolls courses
     s1.enroll(db, 1001);
     s1.enroll(db, 1999);
-    s1.enroll(db, 2021);
+    s1.enroll(db, 2021);*/
     s2.enroll(db, 2611); // s2 enrolls courses
     s2.enroll(db, 1001);
     s2.enroll(db, 1999);
     s2.enroll(db, 2021);
-
     // Print course plans in the tree format
-    s1.print_course_plan_tree(); cout << endl; // BST tree
+  //  s1.print_course_plan_tree(); cout << endl; // BST tree
     s2.print_course_plan_tree(); cout << endl; // AVL tree
-
+/*
     cout << "After further enrolling courses 3021, 4211, 3111, 4321:" << endl;
     s1.enroll(db, 3021);
     s1.enroll(db, 4211);
@@ -129,6 +130,7 @@ int main()
     s2.enroll(db, 4211);
     s2.enroll(db, 3111);
     s2.enroll(db, 4321);
+
 
     // Print course plans in the tree format
     s1.print_course_plan_tree(); cout << endl; // BST tree
@@ -185,7 +187,7 @@ int main()
 
     s1.print_course_plan_tree(); cout << endl;
     s2.print_course_plan_tree(); cout << endl;
-
+*/
     return 0;
 }
 
