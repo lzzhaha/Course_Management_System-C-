@@ -42,7 +42,7 @@ string Timeslot::convert(weekday day) const
 ostream& operator<<(ostream& os, const Timeslot& time)
 {
 	//write your codes here
-	os<<"Lecture Time: "<<time.convert(time.day1)<<"|"<<time.convert(time.day2)<<" [";
+	os<<"Lecture time: "<<time.convert(time.day1)<<"|"<<time.convert(time.day2)<<" [";
 
 	if(time.start<10){
 		os<<"0"<<time.start;
