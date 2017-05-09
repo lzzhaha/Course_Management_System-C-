@@ -18,15 +18,24 @@ BT<T,K>* BST<T,K>::search(const K& k)
 {
     //write your codes here
 	//Use dynamic cast to convert the abstract base class pointer to BST pointer
-	if(this->root->key == k||this->root==NULL){
+	if(this->root==NULL||this->root->key == k){
 		return this;
 	}else if(this->root->key < k){
+		BST<T,K> *right_sub = dynamic_cast<BST<T,K>*>(this->right_subtree());
 
-		BST<T,K> *right_sub = dynamic_cast<BST<T,K>*>(this->root->right);
+		if(right_sub == NULL){
+			return NULL;
+		}
+
 		return right_sub->search(k);
 	}else{
 
-		BST<T,K> *left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
+		BST<T,K> *left_sub = dynamic_cast<BST<T,K>*>(this->left_subtree());
+
+		if(left_sub == NULL){
+			return NULL;
+		}
+
 		return left_sub->search(k);
 	}
 }
@@ -40,7 +49,7 @@ template <typename T, typename K>
 BT<T,K>* BST<T,K>::find_min()
 {
     //write your codes here
-	if(this->root == NULL || this->root->left == NULL){
+	if(this->root == NULL || this->root->left == NULL||dynamic_cast<BST<T,K>*>(this->root->left)->root==NULL){
 		return this;
 	}else{
 		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(this->root->left);
@@ -58,7 +67,7 @@ void BST<T,K>::insert(const T& x, const K& k)
 
 	if(  this->root == NULL){
 
-		cout<< "The inserted key : "<< k<<" is inserted"<<endl;
+		//cout<< "The inserted key : "<< k<<" is inserted"<<endl;
 
 		this->root = new bt_node(x,k);
 
@@ -110,40 +119,71 @@ void BST<T,K>::remove(const K& k)
 
 	//the k does not equals to the key of node
 	if(this->root->key > k){
-		this->root->bt_height--;
-		this->root->left->remove(k);
+		if(this->root->left == NULL){
+			return;
+		}
+		dynamic_cast<BST<T,K>*>(this->root->left)->remove(k);
 	}else if(this->root->key <k){
-		this->root->bt_height--;
-		this->root->right->remove(k);
-	}
+		if(this->root->right == NULL){
+			return;
+		}
+		dynamic_cast<BST<T,K>*>(this->root->right)->remove(k);
+	}else{
 
 	//the target node is found, there are three cases
 
 	//Two children: move root to point to the node with minimum node of right sub tree and adjust the relationship
-	if(this->root->left && this->root->right){
-		bt_node* del_node = this->root;
-		BST<T,K>* newRoot = dynamic_cast<BST<T,K>*>(this->root->right->find_min());
-		this->root = newRoot->root;
+		if(this->root->left  && this->root->right && dynamic_cast<BST<T,K>*>(this->root->left)->root
+				&& dynamic_cast<BST<T,K>*>(this->root->left)->root){
+			bt_node* del_node = this->root;
+			//cout<<del_node->value<<" has two child"<<endl;
 
-		BST<T,K>* new_right_sub = dynamic_cast<BST<T,K>*>(newRoot->root->right);
+			BST<T,K>* newRoot = dynamic_cast<BST<T,K>*>(dynamic_cast<BST<T,K>*>(this->root->right)->find_min());
+			//this->root = newRoot->root;
 
-		newRoot->root = new_right_sub->root;
-		this->root->left = del_node->left;
-		this->root->right = del_node->right;
+			this->root->value = newRoot->root->value;
+			this->root->key = newRoot->root->key;
 
-		del_node->left = del_node->right = NULL;
-		delete del_node;
-	}else{
-		//One child or no child
-		//set the pointer points to its child (if any) then delete it directly
-		bt_node* del_node = this->root;
+			dynamic_cast<BST<T,K>*>(this->right_subtree())->remove(newRoot->root->key);
+			/*
+			BST<T,K>* new_right_sub = dynamic_cast<BST<T,K>*>(newRoot->root->get_rightsubtree());
 
-		BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(del_node->right);
-		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(del_node->left);
 
-		this->root = (right_sub == NULL)? left_sub->root:right_sub->root;
-		del_node->left = del_node->right = NULL;
-		delete del_node;
+			if(new_right_sub == NULL){
+				newRoot->root = NULL;
+			}else{
+				newRoot->root = new_right_sub->root;
+			}
+
+			newRoot = new_right_sub;
+
+			this->root->left = del_node->left;
+			this->root->right = del_node->right;
+
+			del_node->left = del_node->right = NULL;
+			delete del_node;
+			delete del;*/
+		}else{
+			//One child or no child
+			//set the pointer points to its child (if any) then delete it directly
+
+			bt_node* del_node = this->root;
+			//cout<<del_node->value<<" has one or no child"<<endl;
+			BST<T,K>* right_sub = dynamic_cast<BST<T,K>*>(del_node->right);
+			BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(del_node->left);
+
+			if(right_sub!= NULL && right_sub->root != NULL){
+				this->root = right_sub->root;
+
+			}else if(left_sub != NULL){
+				this->root = left_sub->root;
+			}else{
+				this->root =NULL;
+			}
+			del_node->left = del_node->right =NULL;
+			delete del_node;
+
+		}
 	}
 }
 
@@ -156,11 +196,11 @@ void BST<T,K>::iterator_init()
 {
 	//Do nothing if the root is NULL
 	if(this->root == NULL){
+		cout<<"root is NULL"<<endl;
 		return;
 	}
 
 	this->current = this->root;
-
 	while(!this->istack.empty()){
 		this->istack.pop();
 	}
@@ -174,7 +214,7 @@ void BST<T,K>::iterator_init()
 template<typename T, typename K>
 bool BST<T,K>::iterator_end()
 {
-    return this->istack.empty();
+    return (this->current == NULL);
 }
 
 
@@ -193,8 +233,11 @@ T& BST<T,K>::iterator_next()
 
 			BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(cur->left);
 
-			cur = dynamic_cast<BST<T,K>*>(left_sub->left_subtree())->root;
-
+			if(left_sub == NULL){
+				cur = NULL;
+			}else{
+				cur = dynamic_cast<BST<T,K>*>(left_sub)->root;
+			}
 		}while(cur != NULL );
 		cur = this->istack.top();
 	}
@@ -214,15 +257,16 @@ T& BST<T,K>::iterator_next()
 	if( (right_sub !=NULL) && (right_sub->root != NULL) ){
 		cur = right_sub->root;
 		this->istack.push(cur);
-
+		//cout<<"right_sub "<<cur->value<<endl;
 		BST<T,K>* left_sub = dynamic_cast<BST<T,K>*>(cur->left);
 
 		//store the left chain into the stack.
 		while( (left_sub != NULL) && (left_sub->root != NULL) ){
 
 			cur = left_sub->root;
-
+			//cout<<"left_sub"<<cur->value<<endl;
 			this->istack.push(cur);
+			left_sub = dynamic_cast<BST<T,K>*>(cur->left);
 		}
 
 		//Now the top of the stack should be the smallest node of the right subtree of the returned node
@@ -232,8 +276,9 @@ T& BST<T,K>::iterator_next()
 	if(!this->istack.empty()){
 		//if the returned node has an empty right_subtree, then cur node should move to its parent node.
 		cur = this->istack.top();
+	}else{
+		cur = NULL;
 	}
-
 	return re_val;
 }
 

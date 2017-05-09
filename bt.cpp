@@ -15,13 +15,16 @@
 template <typename T, typename K>
 void BT<T,K>::preorder_traversal() const
 {
-    //write your codes here
+    if(this->root == NULL){
+    	return;
+    }
 	cout<<"Key: "<<root->key<<"\t"<<"Value: "<<root->value<<endl;;
 
-	if(root->left != NULL){
+	if(root->left != NULL && root->left->root!=NULL){
 		root->left->preorder_traversal();
 	}
-	if(root->right != NULL){
+
+	if(root->right != NULL && root->right->root!=NULL){
 		root->right->preorder_traversal();
 	}
 

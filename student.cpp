@@ -126,11 +126,13 @@ void Student::drop(const int code)
 void Student::select_by_code(int base)
 {
     cout << "Student ID: " << id << endl;
+    if(course_plan == NULL){
+    	return;
+    }
 
     course_plan->iterator_init();
-
     while(!course_plan->iterator_end()){
-    	Course cr = course_plan->iterator_next();
+    	Course& cr = course_plan->iterator_next();
     	if(cr.get_code() > base){
     		cout<<cr<<endl;
     	}
@@ -161,10 +163,13 @@ void Student::select_by_day(weekday day)
 void Student::check_course(int code) const
 {
     //Write your codes here
-
+	if(course_plan == NULL){
+		cout<<"No"<<endl;
+		return;
+	}
     //Please refer to the sample output for the output message.
 	BT<Course,int>* result = course_plan->search(code);
-	if(result->is_empty()){
+	if(result == NULL || result->is_empty()){
 		cout<<"No"<<endl;
 	}else{
 		result->print_value();
